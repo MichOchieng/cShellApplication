@@ -6,7 +6,7 @@
 #include <string.h>
 #include <math.h>
 
-int main(){  
-     
+int main(int argc,char ** argv){  
+    printf("This is a test for echo\n");
     return 0;
 }
