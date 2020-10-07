@@ -6,17 +6,7 @@
 #include <string.h>
 #include <math.h>
 
-#define cdPath "util/changeDirectory.c"
-#define lsPath "util/listShows.c"
-#define echoPath "util/echo.c"
-#define catPath "util/concatenate.c"
-
-
 void shell();
-// void listShows();
-// void changeDirectory();
-// void concatenate();
-// void ecco();
 void execute(char ** args);
 void terminate();
 char * reader();
@@ -62,8 +52,7 @@ char * reader(){
             }
             i++;
         }        
-    }   
-    printf("You entered: %s\n",input);
+    }
     return input;
 }
 
@@ -85,10 +74,10 @@ char ** parser(char * input){
             // If the memory block is too small for their input
             if(i == pow(2,n)){
                 // Increase the size of the alloted memory
-                printf("Increasing alloted memory...\n");
+                // printf("Increasing alloted memory...\n");
                 n++;
                 parseArray = realloc(parseArray, pow(2,n)*sizeof(char*));
-                printf("Increase successful!\n");
+                // printf("Increase successful!\n");
             }
             i++;
             token = strtok(NULL,delims);
@@ -97,37 +86,47 @@ char ** parser(char * input){
 }
 
 void execute(char ** args){
+    int status;
     int thisID = fork();
+    char *paths[]={"util/cd","util/cat","util/ls","util/echo"};
 
     char *cd = "cd";
     char *ls = "ls";
     char *echo = "echo";
     char *cat = "cat";
     // Handles child process 
-    if (thisID == 0){
-        printf("---child born\n");
-        if (strcmp(args[0],cd) == 0){
-            printf("Send to CD file\n");
+    if (thisID == 0){       
+        // Directs to correct command based on the first token in the args array
+        if (strcmp(args[0],cd) == 0){            
+            execv(paths[0],args);
         }else if (strcmp(args[0],ls) == 0){
-            printf("Send to ls file\n");
+            execv(paths[2],args);
         }else if (strcmp(args[0],echo) == 0){
-            printf("Send to echo file\n");
+            execv(paths[3],args);
         }else if (strcmp(args[0],cat) == 0){
-            printf("Send to cat file\n");
+            execv(paths[1],args);
         }else{
-            // printf(*args[0],": command not found %p\n");
+            // Handles undefined commands
+            printf("Command not found \n");
         }                      
     }
-    else if(thisID < 0){
+    else if(thisID == -1){
         // Error in forking
         printf("Error forking, exitting.");
         exit(0);
     }
     else{
-        // Wait for the child process
-            
+        // Wait for the child process to either exit normally or fail
+        printf("---Main process waiting\n"); 
+        wait(&status);
+        printf("---Main process done waiting\n");    
     }
     
+}
+
+void terminate(){
+    // Ask's if user wants to leave fr
+    // Yes -> exit() No-> back to main
 }
 
 void welcome(){
