@@ -5,14 +5,19 @@
 #include <unistd.h>
 #include <string.h>
 #include <math.h>
-#include "headers/main.h"
+
+#define cdPath "util/changeDirectory.c"
+#define lsPath "util/listShows.c"
+#define echoPath "util/echo.c"
+#define catPath "util/concatenate.c"
+
 
 void shell();
-void test();
-void listShows();
-void changeDirectory();
-void concatenate();
-void ecco();
+// void listShows();
+// void changeDirectory();
+// void concatenate();
+// void ecco();
+void execute(char ** args);
 void terminate();
 char * reader();
 char ** parser();
@@ -27,12 +32,9 @@ void shell(){
     welcome();
     bool on = true;
     // Will always run at very least once
-    do{
-        // Takes in user input
-        parser(reader());    
-        // Parses input
-
-        // Executes command
+    do{       
+    //    parser(reader());
+       execute(parser(reader()));
     }while(on); 
 }
 
@@ -78,7 +80,6 @@ char ** parser(char * input){
 
     while (token != NULL)
         {           
-            printf("Token: %s\n",token);
             // Add token to parse array
             parseArray[i] = token;            
             // If the memory block is too small for their input
@@ -91,8 +92,42 @@ char ** parser(char * input){
             }
             i++;
             token = strtok(NULL,delims);
-        }
+        }    
     return parseArray;
+}
+
+void execute(char ** args){
+    int thisID = fork();
+
+    char *cd = "cd";
+    char *ls = "ls";
+    char *echo = "echo";
+    char *cat = "cat";
+    // Handles child process 
+    if (thisID == 0){
+        printf("---child born\n");
+        if (strcmp(args[0],cd) == 0){
+            printf("Send to CD file\n");
+        }else if (strcmp(args[0],ls) == 0){
+            printf("Send to ls file\n");
+        }else if (strcmp(args[0],echo) == 0){
+            printf("Send to echo file\n");
+        }else if (strcmp(args[0],cat) == 0){
+            printf("Send to cat file\n");
+        }else{
+            // printf(*args[0],": command not found %p\n");
+        }                      
+    }
+    else if(thisID < 0){
+        // Error in forking
+        printf("Error forking, exitting.");
+        exit(0);
+    }
+    else{
+        // Wait for the child process
+            
+    }
+    
 }
 
 void welcome(){
