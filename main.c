@@ -5,12 +5,15 @@
 #include <unistd.h>
 #include <string.h>
 #include <math.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 void shell();
 void execute(char ** args);
 void terminate();
 char * reader();
 char ** parser();
+void changeDirectory(char ** input);
 void welcome();
 
 struct inputInfo{
@@ -27,8 +30,7 @@ void shell(){
     welcome();
     bool on = true;
     // Will always run at very least once
-    do{       
-    //    parser(reader());
+    do{   
        execute(parser(reader()));
     }while(on); 
 }
@@ -103,17 +105,20 @@ void execute(char ** args){
     char *l = "l";    
     char *echo = "echo";
     char *cat = "cat";
+    char *exit = "exit";
     // Handles child process 
     if (thisID == 0){       
         // Directs to correct command based on the first token in the args array
         if (strcmp(args[0],cd) == 0){            
-            execv(paths[0],args);
+            // No child born
         }else if (strcmp(args[0],ls) == 0 || strcmp(args[0],l) == 0 ){
             execv(paths[2],args);
         }else if (strcmp(args[0],echo) == 0){
             execv(paths[3],args);
         }else if (strcmp(args[0],cat) == 0){
             execv(paths[1],args);
+        }else if (strcmp(args[0],exit) == 0){
+            terminate();
         }else{
             // Handles undefined commands
             printf("%s",args[0]);
@@ -132,9 +137,25 @@ void execute(char ** args){
     
 }
 
-void terminate(){
-    // Ask's if user wants to leave fr
-    // Yes -> exit() No-> back to main
+void changeDirectory(char ** input){
+
+}
+
+void terminate(){    
+    char c;
+    printf("Are you sure you want to exit? [y/n]\n");
+    c = getchar();
+    if (c == 'y'){
+        printf("Goodbye\n");
+        exit(0);
+    }
+    else if(c == 'n'){
+        printf("Returning to shell...\n");
+        shell();
+    }
+    else{
+        printf(": is not an option, try again.\n");
+    }   
 }
 
 void welcome(){
