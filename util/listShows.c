@@ -33,16 +33,36 @@ void ls(char ** input){
                     printf("%s ",name->d_name);
                 }              
                 
-            }  
+            } 
+            printf("\n"); 
         }             
-    }
-    // For ls -l command
-    else if (input[1] == func2){
-        /* code */
-    }
+    }    
     // For ls -Dir- commands
-    else if (0){
-        // Multiple folders
+    else if (input[1] != NULL){
+        int i = 1;
+        while (input[i] != NULL){
+            dir = opendir(input[i]); // Opens current directory       
+            if (dir == NULL){
+                printf("Error finding working directory.");
+                break;
+            }else{            
+                // Reads the current directory
+                while ((name = readdir(dir)) != NULL){
+                    // Should add a '/' after folders
+                    if ((name->d_type) == 4){                    
+                        printf("%s",name->d_name);
+                        printf("/ ");
+                    }
+                    else{
+                        printf("%s ",name->d_name);
+                    }              
+                    
+                }
+                printf("\n");   
+            }
+            i++;
+        }
+        
     }
     
     closedir(dir);
