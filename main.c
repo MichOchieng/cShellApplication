@@ -105,7 +105,7 @@ char ** parser(char * input){
 void execute(char ** args){
     int status;
     int thisID = fork();
-    char *paths[]={"util/cd","util/cat","util/ls","util/echo"};
+    char *paths[]={"cd","cat","ls","echo"};
 
     char *cd = "cd";
     char *ls = "ls";
@@ -116,15 +116,16 @@ void execute(char ** args){
     // Handles child process 
     if (thisID == 0){       
         // Directs to correct command based on the first token in the args array
+        // Using execvp so that I can access the exe files even after changing directories
         if (strcmp(args[0],cd) == 0){            
             // No child born
             changeDirectory(args);
-        }else if (strcmp(args[0],ls) == 0 || strcmp(args[0],l) == 0 ){
-            execv(paths[2],args);
+        }else if (strcmp(args[0],ls) == 0 || strcmp(args[0],l) == 0 ){            
+            execvp(paths[2],args);            
         }else if (strcmp(args[0],echo) == 0){
-            execv(paths[3],args);
+            execvp(paths[3],args);
         }else if (strcmp(args[0],cat) == 0){
-            execv(paths[1],args);
+            execvp(paths[1],args);
         }else if (strcmp(args[0],exit) == 0){
             terminate();
         }else{
