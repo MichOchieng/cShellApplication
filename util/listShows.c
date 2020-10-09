@@ -11,7 +11,7 @@ DIR * dir;
 struct dirent *name;
 
 int main(int argc,char ** argv){  
-    ls(argv);
+    ls(argv);    
     return 0;
 }
 
@@ -65,7 +65,7 @@ void ls(char ** input){
     }    
     closedir(dir);    
 }
-
+// Returns the current working directory (from example in source 10)
 char * workingDir(){
     long size = pathconf(".",_PC_PATH_MAX);
     char * dirName; 
