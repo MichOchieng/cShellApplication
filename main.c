@@ -10,23 +10,24 @@
 
 void shell();
 void execute(char ** args);
-void terminate();
+int terminate();
 char * reader();
 char ** parser();
 void changeDirectory(char ** input);
 char * workingDir();
+void printString();
 void welcome();
 
 DIR *dir;
 struct dirent *name;
 
-struct inputInfo{
-    char ** parseArray;
-    int parseArrayLength;
-};
-
-int main(){   
-    shell(); 
+int main(int argc, char ** argv){   
+    if (argc > 1)
+    {
+        printString(argv);
+    }else{
+        shell();
+    }     
     return 0;
 }
 
@@ -35,7 +36,7 @@ void shell(){
     bool on = true;
     // Will always run at very least once
     do{   
-       execute(parser(reader()));
+       execute(parser(reader()));            
     }while(on); 
 }
 
@@ -72,12 +73,10 @@ char * reader(){
 
 // Returns a command and argument
 char ** parser(char * input){
-    struct inputInfo inputInfo;
-
     unsigned int n = 1; // Size of the parse array  
     unsigned int i = 0; // Used for looping through parse array  
     // Will contain tokens from the input array for later use
-    inputInfo.parseArray = malloc(sizeof(char) * pow(2,n));
+    char ** parseArray = malloc(sizeof(char) * pow(2,n));
     // Delimeters for strtok method
     const char delims[] = " \n\t\r\v\f";
     // Temperary holder for input string tokens
@@ -86,33 +85,33 @@ char ** parser(char * input){
     while (token != NULL)
         {           
             // Add token to parse array
-            inputInfo.parseArray[i] = token;            
+            parseArray[i] = token;            
             // If the memory block is too small for their input
             if(i == pow(2,n)){
                 // Increase the size of the alloted memory
                 // printf("Increasing alloted memory...\n");
                 n++;
-                inputInfo.parseArray = realloc(inputInfo.parseArray, pow(2,n)*sizeof(char*));
+                parseArray = realloc(parseArray, pow(2,n)*sizeof(char*));
                 // printf("Increase successful!\n");
             }
             i++;
             token = strtok(NULL,delims);
-        }
-       inputInfo.parseArrayLength = i;
-    return inputInfo.parseArray;
+        }  
+    parseArray[i] = NULL;     
+    return parseArray;
 }
 
 void execute(char ** args){
     int status;
     int thisID = fork();
-    char *paths[]={"cd","cat","ls","echo"};
+    char *paths[]={"cd","cat","ls","util/echo"};
 
     char *cd = "cd";
     char *ls = "ls";
     char *l = "l";    
     char *echo = "echo";
     char *cat = "cat";
-    char *exit = "exit";
+    char *exitt = "exit";
     // Handles child process 
     if (thisID == 0){       
         // Directs to correct command based on the first token in the args array
@@ -126,8 +125,8 @@ void execute(char ** args){
             execvp(paths[3],args);
         }else if (strcmp(args[0],cat) == 0){
             execvp(paths[1],args);
-        }else if (strcmp(args[0],exit) == 0){
-            terminate();
+        }else if (strcmp(args[0],exitt) == 0){
+            terminate();        
         }else{
             // Handles undefined commands
             printf("%s",args[0]);
@@ -136,11 +135,11 @@ void execute(char ** args){
     }
     else if(thisID == -1){
         // Error in forking
-        printf("Error forking, exitting.");        
+        printf("Error forking.");        
     }
     else{
         // Wait for the child process   
-        wait(&status);           
+        wait(&status);                  
     }
     
 }
@@ -164,13 +163,12 @@ char * workingDir(){
     return dirName;
 }
 
-void terminate(){    
+int terminate(){    
     char c;
     printf("Are you sure you want to exit? [y/n]\n");
     c = getchar();
     if (c == 'y'){
-        printf("Goodbye\n");
-        exit(0);
+        return 0;
     }
     else if(c == 'n'){
         printf("Returning to shell...\n");
@@ -181,6 +179,29 @@ void terminate(){
     }   
 }
 
+// Takes command line arguments and prints them
+void printString(char ** args){
+    int i = 1;    
+    while (args[i] != NULL){        
+        printf("%s",args[i]);
+        printf(" ");
+        i++;
+    }
+    printf("\n");
+}
+
 void welcome(){
-    printf("Welcome to my shell.\n");
+    char *fileName = "welcome";
+    FILE *file;
+    file = fopen(fileName,"r");
+    if(file == NULL){
+        printf("File cannot be opened.\n");
+        exit(0);
+    }  
+    char c = fgetc(file);
+    while(c!=EOF){
+        printf("%c",c);
+        c = fgetc(file);
+    }
+    fclose(file);
 }
