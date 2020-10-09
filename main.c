@@ -14,7 +14,11 @@ void terminate();
 char * reader();
 char ** parser();
 void changeDirectory(char ** input);
+char * workingDir();
 void welcome();
+
+DIR *dir;
+struct dirent *name;
 
 struct inputInfo{
     char ** parseArray;
@@ -37,6 +41,9 @@ void shell(){
 
 // Returns pointer to users input
 char * reader(){
+    char * dirName = workingDir();
+    printf("%s",dirName);
+    printf(": ");
     unsigned int n = 1; // Size of the input string
     unsigned int i = 0; // Used for looping through char array
     // Allocate memory
@@ -111,6 +118,7 @@ void execute(char ** args){
         // Directs to correct command based on the first token in the args array
         if (strcmp(args[0],cd) == 0){            
             // No child born
+            changeDirectory(args);
         }else if (strcmp(args[0],ls) == 0 || strcmp(args[0],l) == 0 ){
             execv(paths[2],args);
         }else if (strcmp(args[0],echo) == 0){
@@ -127,8 +135,7 @@ void execute(char ** args){
     }
     else if(thisID == -1){
         // Error in forking
-        printf("Error forking, exitting.");
-        exit(0);
+        printf("Error forking, exitting.");        
     }
     else{
         // Wait for the child process   
@@ -138,7 +145,22 @@ void execute(char ** args){
 }
 
 void changeDirectory(char ** input){
+    if (input[2] != NULL){
+        printf("Too many arguments given\n");
+    }else{        
+        chdir(input[1]);
+    }   
+}
 
+// Returns the current working directory (from example in source 10)
+char * workingDir(){
+    long size = pathconf(".",_PC_PATH_MAX);
+    char * dirName; 
+    char * buf;
+    if((buf = (char *)malloc((size_t)size))!= NULL){
+        dirName = getcwd(buf,(size_t)size);
+    }
+    return dirName;
 }
 
 void terminate(){    
