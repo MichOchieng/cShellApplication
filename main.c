@@ -149,6 +149,7 @@ void execute(char ** args){
     }    
 }
 
+// Changes directory depending on the given inputs
 void changeDirectory(char ** input){
     unsigned int n = 1;       
     char * directory = malloc(sizeof(char) * pow(2,n));
@@ -168,12 +169,16 @@ void changeDirectory(char ** input){
             }
             i++;
         }          
-        chdir(directory); 
+        if (chdir(directory) != 0){
+            printf("%s",directory);
+            printf(": No such file in directory");
+        }        
         directory = NULL;    
         free(directory);    
     }        
-    else{        
-        chdir(input[1]);
+    else if(chdir(input[1]) != 0){        
+        printf("%s",input[1]);
+        printf(": No such file in directory");     
     }   
 }
 
