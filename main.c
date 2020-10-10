@@ -37,8 +37,12 @@ void shell(){
     welcome();
     bool on = true;
     // Will always run at very least once
-    do{   
-       execute(parser(reader()));            
+    do{        
+       execute(parser(reader()));  
+       input = NULL;
+       parseArray = NULL;
+       free(input);
+       free(parseArray);          
     }while(on); 
 }
 
@@ -154,7 +158,7 @@ void changeDirectory(char ** input){
         while (input[i] != NULL){
             directory = strcat(directory,input[i]);
             if(input[i+1]!=NULL){
-                // Will only add white space to tokens in the middle of path
+                // Will only add white space to tokens in the middle of path (wont add to last element)
                 directory = strcat(directory," ");
             }            
             if(i == pow(2,n)){
@@ -181,6 +185,8 @@ char * workingDir(){
     if((buf = (char *)malloc((size_t)size))!= NULL){
         dirName = getcwd(buf,(size_t)size);
     }
+    buf = NULL;
+    free(buf);
     return dirName;
 }
 
