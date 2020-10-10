@@ -149,7 +149,7 @@ void execute(char ** args){
     }    
 }
 
-// Changes directory depending on the given inputs
+// Changes directory depending on the given inputs (Doesn't use quotation marks)
 void changeDirectory(char ** input){
     unsigned int n = 1;       
     char * directory = malloc(sizeof(char) * pow(2,n));
