@@ -178,7 +178,7 @@ void changeDirectory(char ** input){
     }        
     else if(chdir(input[1]) != 0){        
         printf("%s",input[1]);
-        printf(": No such file in directory");     
+        printf(": No such file in directory \n");     
     }   
 }
 
